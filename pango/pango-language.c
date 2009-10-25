@@ -614,7 +614,7 @@ pango_language_get_scripts (PangoLanguage *language,
   if (num_scripts)
     {
       for (j = 0; j < G_N_ELEMENTS (script_for_lang->scripts); j++)
-	if (script_for_lang->scripts[j] == 0)
+	if (script_for_lang->scripts[j] == -1)
 	  break;
 
       g_assert (j > 0);
@@ -659,7 +659,7 @@ pango_language_includes_script (PangoLanguage *language,
 
 /* copied from the one in pango-script.c */
 #define REAL_SCRIPT(script) \
-  ((script) > PANGO_SCRIPT_INHERITED && (script) != PANGO_SCRIPT_UNKNOWN)
+  ((script) != PANGO_SCRIPT_INHERITED && (script) != PANGO_SCRIPT_INVALID_CODE && (script) != PANGO_SCRIPT_UNKNOWN)
 
   if (!REAL_SCRIPT (script))
     return TRUE;

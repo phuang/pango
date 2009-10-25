@@ -220,7 +220,7 @@ get_pair_index (gunichar ch)
 
 /* duplicated in pango-language.c */
 #define REAL_SCRIPT(script) \
-  ((script) > PANGO_SCRIPT_INHERITED && (script) != PANGO_SCRIPT_UNKNOWN)
+  ((script) != PANGO_SCRIPT_INHERITED && (script) != PANGO_SCRIPT_INVALID_CODE && (script) != PANGO_SCRIPT_UNKNOWN)
 
 #define SAME_SCRIPT(script1, script2) \
   (!REAL_SCRIPT (script1) || !REAL_SCRIPT (script2) || (script1) == (script2))
@@ -248,7 +248,7 @@ pango_script_iter_next (PangoScriptIter *iter)
     return FALSE;
 
   start_sp = iter->paren_sp;
-  iter->script_code = PANGO_SCRIPT_COMMON;
+  iter->script_code = PANGO_SCRIPT_INVALID_CODE;
   iter->script_start = iter->script_end;
 
   for (; iter->script_end < iter->text_end; iter->script_end = g_utf8_next_char (iter->script_end))
@@ -258,6 +258,7 @@ pango_script_iter_next (PangoScriptIter *iter)
       int pair_index;
 
       sc = pango_script_for_unichar (ch);
+#if 0
       if (sc != PANGO_SCRIPT_COMMON)
 	pair_index = -1;
       else
@@ -302,9 +303,12 @@ pango_script_iter_next (PangoScriptIter *iter)
 		sc = iter->paren_stack[iter->paren_sp].script_code;
 	    }
 	}
-
+#endif
       if (SAME_SCRIPT (iter->script_code, sc))
 	{
+	  if (!REAL_SCRIPT (iter->script_code) && REAL_SCRIPT (sc))
+	    iter->script_code = sc;
+#if 0
 	  if (!REAL_SCRIPT (iter->script_code) && REAL_SCRIPT (sc))
 	    {
 	      iter->script_code = sc;
@@ -328,6 +332,7 @@ pango_script_iter_next (PangoScriptIter *iter)
 	      if (iter->paren_sp < start_sp)
 		start_sp = iter->paren_sp;
 	    }
+#endif
 	}
       else
 	{
@@ -335,7 +340,6 @@ pango_script_iter_next (PangoScriptIter *iter)
 	  break;
 	}
     }
-
   return TRUE;
 }
 
